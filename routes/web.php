@@ -20,3 +20,9 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+
+
+Route::get('/vehicles', 'VehicleController@index')->name('vehicles.index');
+Route::get('/vehicles/add', 'VehicleController@addVehicle')->name('vehicles.add');
+Route::post('/vehicles/store', 'VehicleController@store')->name('vehicles.store');
