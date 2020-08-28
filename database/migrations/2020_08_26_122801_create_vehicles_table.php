@@ -18,6 +18,7 @@ class CreateVehiclesTable extends Migration
             $table->string('vehicle_type');
             $table->string('vehicle_model');
             $table->string('vehicle_plate');
+            $table->string('time_in');
             $table->timestamps();
         });
     }
