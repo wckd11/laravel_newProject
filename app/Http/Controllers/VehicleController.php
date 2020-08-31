@@ -4,12 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Vehicle;
+use Carbon\Carbon;
+use App\Status;
 
 class VehicleController extends Controller
 {
 
-    public function index(){
-    	$vehicles = Vehicle::all();
+    public function index(Request $request){
+    	$filter_check_vehicles = $request->check_vehicles;
+
+    	if($filter_check_vehicles){
+			$vehicles = Vehicle::where('check_vehicles', '=', $filter_check_vehicles);
+    	}else{
+    		$vehicles = Vehicle::all();		
+    	}
+	
     	return view('vehicles.index', array('vehicles' => $vehicles));
     }
 
@@ -54,5 +63,46 @@ class VehicleController extends Controller
     	}
 
     	return redirect()->back()->withStatus('Vehicle Updated.');
+    }
+
+    public function checkStatus(){
+    	$vehicles = Vehicle::all();
+    	$todaysDate = Carbon::today();
+
+    	return view('vehicles.check-status', compact('vehicles', 'todaysDate'));
+    }
+
+    public function statusPark(Request $request){
+    	$vehicle = Vehicle::find($request->id);
+    	$status = Status::where('user_id', $request->id)
+    					->whereDate('status_date', Carbon::parse($request->todaysDate))
+    					->first();
+    	if(!$status){
+    		$status = new Status;
+    	}
+
+    	$status->user_id = $request->id;
+    	$status->status_date = Carbon::parse($request->todays_date);
+    	$status->is_park = true;
+    	$status->save();
+
+    	return redirect()->back()->withStatus('Vehicle Successfully Checked-Out.');
+    }
+
+    public function statusOut(Request $request){
+    	$vehicle = Vehicle::find($request->id);
+    	$status = Status::where('user_id', $request->id)
+    					->whereDate('status_date', Carbon::parse($request->todaysDate))
+    					->first();
+    	if(!$status){
+    		$status = new Status;
+    	}
+
+    	$status->user_id = $request->id;
+    	$status->status_date = Carbon::parse($request->todays_date);
+    	$status->is_park = false;
+    	$status->save();
+
+    	return redirect()->back()->withStatus('Vehicle Successfully Parked.');
     }
 }
